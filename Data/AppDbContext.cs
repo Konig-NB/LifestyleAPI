@@ -9,6 +9,7 @@ namespace LifestyleAPI.Data
 
         public DbSet<User> Users => Set<User>();
         public DbSet<Category> Categories => Set<Category>();
+        public DbSet<Menu> Menus => Set<Menu>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -22,6 +23,13 @@ namespace LifestyleAPI.Data
             modelBuilder.Entity<User>()
                 .Property(c => c.Role)
                 .HasConversion<string>();
+
+            // Menu -> Category (many-to-one)
+            modelBuilder.Entity<Menu>()
+                .HasOne(m => m.Category)
+                .WithMany(c => c.Menus)
+                .HasForeignKey(m => m.CategoryId)
+                .OnDelete(DeleteBehavior.Cascade);  
         }
     }
 }
