@@ -8,5 +8,7 @@ namespace LifestyleAPI.Models
 
         [Required, StringLength(100)]
         public string Name {get; set;} = string.Empty;
+
+        public ICollection<Menu> Menus {get; set;} = new List<Menu>();
     }
 }
