@@ -15,7 +15,7 @@ namespace LifestyleAPI.Controllers
         public CategoryController(ICategoryService service) => _service = service;
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> GetAll(
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10)
@@ -28,7 +28,7 @@ namespace LifestyleAPI.Controllers
         }
 
         [HttpGet("{id:int}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Owner")]
         public async Task<IActionResult> GetById(int id)
         {
             var category = await _service.GetByIdAsync(id);
@@ -39,7 +39,7 @@ namespace LifestyleAPI.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Owner")]
         public async Task<IActionResult> Create([FromBody] CreateCategoryDTO dto)
         {
             var created = await _service.CreateAsync(dto);
@@ -47,7 +47,7 @@ namespace LifestyleAPI.Controllers
         }
 
         [HttpPatch("{id:int}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Owner")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateCategoryDTO dto)
         {
             var updated = await _service.UpdateAsync(id, dto);

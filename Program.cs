@@ -70,8 +70,8 @@ try
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = jwtSettings["ValidIssuer"],
-            ValidAudience = jwtSettings["ValidAudience"],
+            ValidIssuer = jwtSettings["Issuer"],
+            ValidAudience = jwtSettings["Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(secretKey),
             ClockSkew = TimeSpan.Zero
         };

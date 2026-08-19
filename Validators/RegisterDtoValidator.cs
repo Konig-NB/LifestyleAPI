@@ -13,7 +13,7 @@ namespace LifestyleAPI.Validators
 
             RuleFor(x => x.PhoneNumber)
                 .NotEmpty().WithMessage("Phone number is required.")
-                .Length(12).WithMessage("Phone number must be 12 characters long.");
+                .Length(10).WithMessage("Phone number must be 10 characters long.");
 
             RuleFor(x => x.Password)
                 .NotEmpty().WithMessage("Password is required.")
