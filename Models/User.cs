@@ -24,5 +24,7 @@ namespace LifestyleAPI.Models
         [Required]
         public UserRole Role {get; set;} = UserRole.Customer;
         public DateTime CreatedAt {get; set;}
+
+        public ICollection<Order> Orders { get; set; } = new List<Order>();
     }
 }
