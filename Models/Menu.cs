@@ -21,5 +21,7 @@ namespace LifestyleAPI.Models
 
         [Required]
         public bool IsAvailable {get; set;}
+
+        public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
     }
 }

@@ -1,0 +1,137 @@
+using LifestyleAPI.Models;
+using LifestyleAPI.Repositories.Interfaces;
+using LifestyleAPI.DTOs;
+using LifestyleAPI.Services.Interfaces;
+using LifestyleAPI.Helpers;
+
+namespace LifestyleAPI.Services
+{
+    public class OrderService : IOrderService
+    {
+        private readonly IOrderRepository _repo;
+        private readonly IMenuRepository _menuRepo;
+        public OrderService(IOrderRepository repo, IMenuRepository menuRepo) 
+        { 
+            _repo = repo;
+            _menuRepo = menuRepo;
+        }
+
+        public async Task<PagedResult<OrderDTO>> GetAllAsync(int page, int pageSize)
+        {
+            var orders = await _repo.GetAllOrdersAsync(page, pageSize);
+            var totalCount = await _repo.GetTotalCountAsync();
+
+            return new PagedResult<OrderDTO>
+            {
+                Data = orders.Select(ToDto),
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize
+            };
+        }
+
+        public async Task<OrderDTO?> GetByIdAsync(int id)
+        {
+            var order = await _repo.GetByIdOrderAsync(id);
+            return order is null ? null : ToDto(order);
+        }
+
+        public async Task<OrderDTO> CreateAsync(CreateOrderDTO dto)
+        {
+            var orderItems = new List<OrderItem>();
+            double totalPrice = 0;
+
+            foreach (var itenmDto in dto.OrderItems)
+            {
+                var menuItem = await _menuRepo.GetByIdMenuAsync(itenmDto.MenuItemId);
+                if (menuItem == null)
+                    throw new KeyNotFoundException($"Menu item {itenmDto.MenuItemId} not found");
+                
+                if (!menuItem.IsAvailable)
+                    throw new InvalidOperationException($"Menu item {itenmDto.MenuItemId} is not available");
+
+                var orderItem = new OrderItem
+                {
+                    MenuItemId = itenmDto.MenuItemId,
+                    Quantity = itenmDto.Quantity,
+                    TotalPrice = menuItem.Price * itenmDto.Quantity,
+                    SpecialInstructions = itenmDto.SpecialInstructions
+                };
+
+                orderItems.Add(orderItem);
+                totalPrice += orderItem.TotalPrice;
+            }
+
+            var order = new Order
+            {
+                CustomerId = dto.CustomerId,
+                OrderItems = orderItems,
+                Status = dto.Status,
+                TotalPrice = totalPrice,
+                CreatedAt = DateTime.UtcNow,
+                EstimatedCompletionTime = dto.EstimatedCompletionTime
+            };
+
+            var created = await _repo.CreateAsync(order);
+            return ToDto(created!);
+        }
+
+        public async Task<OrderDTO?> UpdateAsync(int id, UpdateOrderDTO dto)
+        {
+            var order = await _repo.GetByIdOrderAsync(id);
+            if (order is null) return null;
+
+            if (order.Status == OrderStatus.Cancelled && dto.Status == OrderStatus.InProgress)
+                throw new InvalidOperationException("Cannot move a cancelled order back to InProgress");
+
+            if (dto.Status.HasValue) order.Status = dto.Status.Value;
+            if (dto.EstimatedCompletionTime is not null) order.EstimatedCompletionTime = dto.EstimatedCompletionTime;
+            order.UpdatedAt = DateTime.UtcNow;
+
+            await _repo.UpdateAsync(order);
+            var updated = await _repo.GetByIdOrderAsync(id);
+            return ToDto(updated!);
+        }
+
+        public async Task<bool> ExistsAsync(int id) =>
+            await _repo.ExistsAsync(id);
+
+        public async Task<PagedResult<OrderDTO>> GetAllForCustomerAsync(int customerId, int page, int pageSize)
+        {
+            var orders = await _repo.GetAllOrdersForCustomerAsync(customerId, page, pageSize);
+            var totalCount = await _repo.GetTotalCountForCustomerAsync(customerId);
+
+            return new PagedResult<OrderDTO>
+            {
+                Data = orders.Select(ToDto),
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize
+            };
+        }
+
+        private static OrderDTO ToDto(Order o) => new OrderDTO
+        {
+            Id = o.Id,
+            CustomerId = o.CustomerId,
+            CustomerName = o.Customer?.Name ?? string.Empty,
+            OrderItems = o.OrderItems
+                .Select(oi => new OrderItemDTO
+                {
+                    Id = oi.Id,
+                    MenuItemId = oi.MenuItemId,
+                    MenuItemName = oi.MenuItem?.Name ?? string.Empty,
+                    MenuItemPrice = oi.MenuItem?.Price ?? 0,
+                    Quantity = oi.Quantity,
+                    TotalPrice = oi.TotalPrice,
+                    SpecialInstructions = oi.SpecialInstructions
+                })
+                .ToList(),
+            Status = o.Status,
+            TotalPrice = o.TotalPrice,
+            EstimatedCompletionTime = o.EstimatedCompletionTime,
+            CreatedAt = o.CreatedAt,
+            UpdatedAt = o.UpdatedAt
+        };
+    }
+}
