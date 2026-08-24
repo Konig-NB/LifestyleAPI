@@ -2,6 +2,7 @@ using LifestyleAPI.DTOs;
 using LifestyleAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace LifestyleAPI.Controllers
 {
@@ -59,7 +60,8 @@ namespace LifestyleAPI.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin,Owner")]
+        [EnableRateLimiting("login")]
+        [Authorize]
         public async Task<IActionResult> Create([FromBody] CreateOrderDTO dto)
         {
             var created = await _service.CreateAsync(dto);
