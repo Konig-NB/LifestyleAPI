@@ -12,6 +12,7 @@ namespace LifestyleAPI.Data
         public DbSet<Menu> Menus => Set<Menu>();
         public DbSet<Order> Orders => Set<Order>();
         public DbSet<OrderItem> OrderItems => Set<OrderItem>();
+        public DbSet<Notification> Notifications => Set<Notification>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -53,6 +54,18 @@ namespace LifestyleAPI.Data
                 .WithMany(m => m.OrderItems)
                 .HasForeignKey(oi => oi.MenuItemId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Notification -> Order (many-to-one)
+            modelBuilder.Entity<Notification>()
+                .HasOne(n => n.Order)
+                .WithMany()
+                .HasForeignKey(n => n.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Enum
+            modelBuilder.Entity<Notification>()
+                .Property(n => n.Status)
+                .HasConversion<string>();
 
         }
     }
