@@ -10,10 +10,12 @@ namespace LifestyleAPI.Services
     {
         private readonly IOrderItemRepository _repo;
         private readonly IMenuRepository _menuRepo;
-        public OrderItemService(IOrderItemRepository repo, IMenuRepository menuRepo) 
+        private readonly IOrderRepository _orderRepo;
+        public OrderItemService(IOrderItemRepository repo, IMenuRepository menuRepo, IOrderRepository orderRepo) 
         { 
             _repo = repo;
             _menuRepo = menuRepo;
+            _orderRepo = orderRepo;
         }
 
         public async Task<PagedResult<OrderItemDTO>> GetAllAsync(int page, int pageSize)
@@ -38,6 +40,14 @@ namespace LifestyleAPI.Services
 
         public async Task<OrderItemDTO> CreateAsync(CreateOrderItemDTO dto)
         {
+            var order = await _orderRepo.GetByIdOrderAsync(dto.OrderId);
+            if (order is null)
+                throw new KeyNotFoundException($"Order {dto.OrderId} not found.");
+
+            if (order.Status is OrderStatus.Completed or OrderStatus.Cancelled)
+                throw new InvalidOperationException(
+                    $"Cannot add items to an order that is already {order.Status}.");
+
             var menuItem = await _menuRepo.GetByIdMenuAsync(dto.MenuItemId);
             if (menuItem == null)
                 throw new KeyNotFoundException($"Menu item {dto.MenuItemId} not found.");
@@ -55,7 +65,13 @@ namespace LifestyleAPI.Services
             };
 
             var created = await _repo.CreateAsync(orderItem);
-            return ToDto(created!);
+            order.OrderItems.Add(created);
+            order.TotalPrice = order.OrderItems.Sum(oi => oi.TotalPrice);
+            order.UpdatedAt = DateTime.UtcNow;
+            await _orderRepo.UpdateAsync(order);
+
+            var withIncludes = await _repo.GetByIdOrderItemAsync(created.Id);
+            return ToDto(withIncludes!);
         }
 
         public async Task<bool> ExistsAsync(int id) =>

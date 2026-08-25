@@ -4,7 +4,7 @@ namespace LifestyleAPI.DTOs.Auth
 {
 public class LoginDto
     {
-        [Required,StringLength(12)]
+        [Required,StringLength(10)]
         public string PhoneNumber { get; set; } = string.Empty;
 
         [Required]

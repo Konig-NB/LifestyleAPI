@@ -15,7 +15,7 @@ namespace LifestyleAPI.Models
         [Required,StringLength(100)]
         public string Name {get; set;} = string.Empty;
 
-        [Required, StringLength(12), MinLength(12)]
+        [Required, StringLength(10), MinLength(10)]
         public string PhoneNumber {get; set;} = string.Empty;
         
         [Required]
