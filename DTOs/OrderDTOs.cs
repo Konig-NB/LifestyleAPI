@@ -5,12 +5,7 @@ namespace LifestyleAPI.DTOs
 {
     public class CreateOrderDTO
     {
-        [Required]
-        public int CustomerId { get; set; }
         public ICollection<CreateOrderItemDTO> OrderItems { get; set; } = new List<CreateOrderItemDTO>();
-
-        [Required]
-        public OrderStatus Status { get; set; } = OrderStatus.Recieved;
         public TimeOnly? EstimatedCompletionTime { get; set; }
     }
 
@@ -26,8 +21,8 @@ namespace LifestyleAPI.DTOs
         public int CustomerId {get; set;}
         public string CustomerName {get; set;} = string.Empty;
         public ICollection<OrderItemDTO> OrderItems { get; set; } = new List<OrderItemDTO>();
-        public OrderStatus Status {get; set;} = OrderStatus.Recieved;
-        public double TotalPrice {get; set;}
+        public OrderStatus Status {get; set;} = OrderStatus.Received;
+        public decimal TotalPrice {get; set;}
         public TimeOnly? EstimatedCompletionTime {get; set;}
         public DateTime CreatedAt {get; set;}
         public DateTime? UpdatedAt {get; set;}

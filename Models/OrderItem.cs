@@ -18,7 +18,7 @@ namespace LifestyleAPI.Models
         public int Quantity {get; set;}
 
         [Required]
-        public double TotalPrice {get; set;}
+        public decimal TotalPrice {get; set;}
         
         [StringLength(250)]
         public string? SpecialInstructions {get; set;}

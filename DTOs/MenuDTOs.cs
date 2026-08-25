@@ -14,7 +14,7 @@ namespace LifestyleAPI.DTOs
         public string Description {get; set;} = string.Empty;
 
         [Required,Range(0.1, double.MaxValue)]
-        public double Price {get; set;}
+        public decimal Price {get; set;}
 
         [Required]
         public bool IsAvailable {get; set;}
@@ -31,7 +31,7 @@ namespace LifestyleAPI.DTOs
         public string? Description {get; set;}
 
         [Range(0.1, double.MaxValue)]
-        public double? Price {get; set;}
+        public decimal? Price {get; set;}
 
         [Required]
         public bool? IsAvailable {get; set;}
@@ -48,7 +48,7 @@ namespace LifestyleAPI.DTOs
 
         public string Description {get; set;} = string.Empty;
 
-        public double Price {get; set;}
+        public decimal Price {get; set;}
 
         public bool IsAvailable {get; set;}
     }

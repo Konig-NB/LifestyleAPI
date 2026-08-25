@@ -4,7 +4,7 @@ namespace LifestyleAPI.Models
 {
     public enum OrderStatus
     {
-        Recieved,
+        Received,
         InProgress,
         Completed,
         Cancelled
@@ -19,10 +19,10 @@ namespace LifestyleAPI.Models
         public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
         [Required]
-        public OrderStatus Status {get; set;} = OrderStatus.Recieved;
+        public OrderStatus Status {get; set;} = OrderStatus.Received;
 
         [Required]
-        public double TotalPrice {get; set;} //Collection of OrderItems TotalPrice that from all the order items the customer ordered
+        public decimal TotalPrice {get; set;} //Collection of OrderItems TotalPrice that from all the order items the customer ordered
 
         [Required]
         public DateTime CreatedAt {get; set;}

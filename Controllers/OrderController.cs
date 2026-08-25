@@ -49,12 +49,18 @@ namespace LifestyleAPI.Controllers
         }
 
         [HttpGet("{id:int}")]
-        [Authorize(Roles = "Admin,Owner")]
+        [Authorize]
         public async Task<IActionResult> GetById(int id)
         {
             var order = await _service.GetByIdAsync(id);
             if (order is null)
                 return NotFound(new { message = $"Order with id {id} was not found." });
+
+            var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+            var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
+
+            if (role == "Customer" && order.CustomerId != userId)
+                return Forbid();
 
             return Ok(order);
         }
@@ -64,7 +70,13 @@ namespace LifestyleAPI.Controllers
         [Authorize]
         public async Task<IActionResult> Create([FromBody] CreateOrderDTO dto)
         {
-            var created = await _service.CreateAsync(dto);
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+                return Unauthorized(new { message = "Required claims are missing." });
+
+            int customerId = int.Parse(userIdClaim.Value);
+
+            var created = await _service.CreateAsync(customerId, dto);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 
@@ -72,11 +84,18 @@ namespace LifestyleAPI.Controllers
         [Authorize(Roles = "Admin,Owner")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateOrderDTO dto)
         {
-            var updated = await _service.UpdateAsync(id, dto);
-            if (updated is null)
-                return NotFound(new { message = $"Order with id {id} was not found." });
+            try
+            {
+                var updated = await _service.UpdateAsync(id, dto);
+                if (updated is null)
+                    return NotFound(new { message = $"Order with id {id} was not found." });
 
-            return Ok(updated);
+                return Ok(updated);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new { message = ex.Message });
+            }
         }
     }
 }

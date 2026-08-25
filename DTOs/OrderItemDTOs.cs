@@ -24,9 +24,9 @@ namespace LifestyleAPI.DTOs
         public string CustomerName {get; set;} = string.Empty;
         public int MenuItemId { get; set; }
         public string MenuItemName { get; set; } = string.Empty;
-        public double MenuItemPrice { get; set; }
+        public decimal MenuItemPrice { get; set; }
         public int Quantity {get; set;}
-        public double TotalPrice {get; set;}
+        public decimal TotalPrice {get; set;}
         public string? SpecialInstructions {get; set;}
     }
 }
