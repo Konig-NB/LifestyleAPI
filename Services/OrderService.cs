@@ -10,10 +10,12 @@ namespace LifestyleAPI.Services
     {
         private readonly IOrderRepository _repo;
         private readonly IMenuRepository _menuRepo;
-        public OrderService(IOrderRepository repo, IMenuRepository menuRepo) 
+        private readonly INotificationService _notificationService;
+        public OrderService(IOrderRepository repo, IMenuRepository menuRepo, INotificationService notificationService) 
         { 
             _repo = repo;
             _menuRepo = menuRepo;
+            _notificationService = notificationService;
         }
 
         private static readonly Dictionary<OrderStatus, OrderStatus[]> AllowedTransitions = new()
@@ -84,6 +86,7 @@ namespace LifestyleAPI.Services
             };
 
             var created = await _repo.CreateAsync(order);
+            await _notificationService.NotifyAsync(created!, created!.Status);
             return ToDto(created!);
         }
 
@@ -91,6 +94,9 @@ namespace LifestyleAPI.Services
         {
             var order = await _repo.GetByIdOrderAsync(id);
             if (order is null) return null;
+
+            bool statusChanged = false;
+            OrderStatus? newStatusForNotification = null;
 
             if (dto.Status.HasValue && dto.Status.Value != order.Status)
             {
@@ -101,12 +107,18 @@ namespace LifestyleAPI.Services
                         $"Cannot change order status from {order.Status} to {newStatus}.");
 
                 order.Status = newStatus;
+                statusChanged = true;
+                newStatusForNotification = newStatus;
             }
 
             if (dto.EstimatedCompletionTime is not null) order.EstimatedCompletionTime = dto.EstimatedCompletionTime;
             order.UpdatedAt = DateTime.UtcNow;
 
             await _repo.UpdateAsync(order);
+
+            if (statusChanged)
+                await _notificationService.NotifyAsync(order, newStatusForNotification!.Value);
+
             var updated = await _repo.GetByIdOrderAsync(id);
             return ToDto(updated!);
         }

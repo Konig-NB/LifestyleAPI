@@ -50,6 +50,7 @@ try
     builder.Services.AddScoped<IMenuRepository, MenuRepository>();
     builder.Services.AddScoped<IOrderRepository, OrderRepository>();
     builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
+    builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 
     //--Services-----------------------------------------------------------
     builder.Services.AddScoped<IAuthService, AuthService>();
@@ -58,6 +59,7 @@ try
     builder.Services.AddScoped<IMenuService, MenuService>();
     builder.Services.AddScoped<IOrderService, OrderService>();
     builder.Services.AddScoped<IOrderItemService, OrderItemService>();
+    builder.Services.AddScoped<INotificationService, NotificationService>();
 
     //--JWT Authentication-----------------------------------------------------------
     var jwtSettings = builder.Configuration.GetSection("JwtSettings");
