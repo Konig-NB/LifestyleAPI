@@ -16,6 +16,14 @@ namespace LifestyleAPI.Services
             _menuRepo = menuRepo;
         }
 
+        private static readonly Dictionary<OrderStatus, OrderStatus[]> AllowedTransitions = new()
+        {
+            [OrderStatus.Received]   = new[] { OrderStatus.InProgress, OrderStatus.Cancelled },
+            [OrderStatus.InProgress] = new[] { OrderStatus.Completed, OrderStatus.Cancelled },
+            [OrderStatus.Completed]  = Array.Empty<OrderStatus>(),
+            [OrderStatus.Cancelled]  = Array.Empty<OrderStatus>()
+        };
+
         public async Task<PagedResult<OrderDTO>> GetAllAsync(int page, int pageSize)
         {
             var orders = await _repo.GetAllOrdersAsync(page, pageSize);
@@ -36,26 +44,29 @@ namespace LifestyleAPI.Services
             return order is null ? null : ToDto(order);
         }
 
-        public async Task<OrderDTO> CreateAsync(CreateOrderDTO dto)
+        public async Task<OrderDTO> CreateAsync(int customerId, CreateOrderDTO dto)
         {
-            var orderItems = new List<OrderItem>();
-            double totalPrice = 0;
+            if (dto.OrderItems is null || dto.OrderItems.Count == 0)
+            throw new InvalidOperationException("An order must contain at least one item.");
 
-            foreach (var itenmDto in dto.OrderItems)
+            var orderItems = new List<OrderItem>();
+            decimal totalPrice = 0;
+
+            foreach (var itemDto in dto.OrderItems)
             {
-                var menuItem = await _menuRepo.GetByIdMenuAsync(itenmDto.MenuItemId);
+                var menuItem = await _menuRepo.GetByIdMenuAsync(itemDto.MenuItemId);
                 if (menuItem == null)
-                    throw new KeyNotFoundException($"Menu item {itenmDto.MenuItemId} not found");
+                    throw new KeyNotFoundException($"Menu item {itemDto.MenuItemId} not found");
                 
                 if (!menuItem.IsAvailable)
-                    throw new InvalidOperationException($"Menu item {itenmDto.MenuItemId} is not available");
+                    throw new InvalidOperationException($"Menu item {itemDto.MenuItemId} is not available");
 
                 var orderItem = new OrderItem
                 {
-                    MenuItemId = itenmDto.MenuItemId,
-                    Quantity = itenmDto.Quantity,
-                    TotalPrice = menuItem.Price * itenmDto.Quantity,
-                    SpecialInstructions = itenmDto.SpecialInstructions
+                    MenuItemId = itemDto.MenuItemId,
+                    Quantity = itemDto.Quantity,
+                    TotalPrice = menuItem.Price * itemDto.Quantity,
+                    SpecialInstructions = itemDto.SpecialInstructions
                 };
 
                 orderItems.Add(orderItem);
@@ -64,9 +75,9 @@ namespace LifestyleAPI.Services
 
             var order = new Order
             {
-                CustomerId = dto.CustomerId,
+                CustomerId = customerId,
                 OrderItems = orderItems,
-                Status = dto.Status,
+                Status = OrderStatus.Received,
                 TotalPrice = totalPrice,
                 CreatedAt = DateTime.UtcNow,
                 EstimatedCompletionTime = dto.EstimatedCompletionTime
@@ -81,10 +92,17 @@ namespace LifestyleAPI.Services
             var order = await _repo.GetByIdOrderAsync(id);
             if (order is null) return null;
 
-            if (order.Status == OrderStatus.Cancelled && dto.Status == OrderStatus.InProgress)
-                throw new InvalidOperationException("Cannot move a cancelled order back to InProgress");
+            if (dto.Status.HasValue && dto.Status.Value != order.Status)
+            {
+                var newStatus = dto.Status.Value;
 
-            if (dto.Status.HasValue) order.Status = dto.Status.Value;
+                if (!AllowedTransitions[order.Status].Contains(newStatus))
+                    throw new InvalidOperationException(
+                        $"Cannot change order status from {order.Status} to {newStatus}.");
+
+                order.Status = newStatus;
+            }
+
             if (dto.EstimatedCompletionTime is not null) order.EstimatedCompletionTime = dto.EstimatedCompletionTime;
             order.UpdatedAt = DateTime.UtcNow;
 

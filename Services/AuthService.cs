@@ -24,13 +24,13 @@ namespace LifestyleAPI.Services
         public async Task<AuthResponseDto> RegisterAsync(RegisterDto dto)
         {
             if(await _db.Users.AnyAsync(u => u.PhoneNumber == dto.PhoneNumber))
-                throw new InvalidCastException("Phone Number is already registered.");
+                throw new InvalidOperationException("Phone Number is already registered.");
 
             var user = new User
             {
                 Name = dto.Name,
                 PhoneNumber = dto.PhoneNumber,
-                Role = dto.Role,
+                Role = UserRole.Customer,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
                 CreatedAt = DateTime.UtcNow
             };

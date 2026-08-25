@@ -15,7 +15,7 @@ namespace LifestyleAPI.Controllers
         public MenuController(IMenuService service) => _service = service;
 
         [HttpGet]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAll(
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10,

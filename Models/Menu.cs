@@ -16,8 +16,8 @@ namespace LifestyleAPI.Models
         [Required,StringLength(250)]
         public string Description {get; set;} = string.Empty;
 
-        [Required,Range(0.1, double.MaxValue)]
-        public double Price {get; set;}
+        [Required,Range(1, double.MaxValue)]
+        public decimal Price {get; set;}
 
         [Required]
         public bool IsAvailable {get; set;}

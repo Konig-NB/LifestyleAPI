@@ -12,7 +12,5 @@ namespace LifestyleAPI.DTOs.Auth
 
         [Required, MinLength(6)]
         public string Password { get; set; } = string.Empty;
-        [Required]
-        public UserRole Role { get; set; } = UserRole.Customer;
     }
 }
