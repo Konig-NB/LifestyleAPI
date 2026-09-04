@@ -1,0 +1,43 @@
+$kind: http-request
+url: "{{baseUrl}}/api/Order"
+method: GET
+headers:
+  Authorization: Bearer {{json_web_token_10m4}}
+body:
+  type: json
+  content: ""
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status code is 200\", function () {\r
+
+      \    pm.response.to.have.status(200);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Response has data, totalCount, page, pageSize\", function () {\r
+
+      \    const body = pm.response.json();\r
+
+      \    pm.expect(body).to.have.property(\"data\");\r
+
+      \    pm.expect(body).to.have.property(\"totalCount\");\r
+
+      \    pm.expect(body).to.have.property(\"page\");\r
+
+      \    pm.expect(body).to.have.property(\"pageSize\");\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Data is an array\", function () {\r
+
+      \    const body = pm.response.json();\r
+
+      \    pm.expect(body.data).to.be.an(\"array\");\r
+
+      \    });"
+    language: text/javascript
+order: 348959372047487

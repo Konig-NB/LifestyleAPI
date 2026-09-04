@@ -1,0 +1,37 @@
+$kind: http-request
+url: "{{baseUrl}}/api/Order"
+method: POST
+headers:
+  Authorization: Bearer {{json_web_token_10m4}}
+body:
+  type: json
+  content: "{\r
+
+    \  \"orderItems\": [\r
+
+    \    {\r
+
+    \      \"orderId\": 0,\r
+
+    \      \"menuItemId\": 1,\r
+
+    \      \"quantity\": 1,\r
+
+    \      \"specialInstructions\": null\r
+
+    \    }\r
+
+    \  ],\r
+
+    \  \"estimatedCompletionTime\": null\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status code is 201 or 409\", function (){\r
+
+      \    pm.expect([201, 429]).to.include(pm.response.code);\r
+
+      });"
+    language: text/javascript
+order: 3293029435494910

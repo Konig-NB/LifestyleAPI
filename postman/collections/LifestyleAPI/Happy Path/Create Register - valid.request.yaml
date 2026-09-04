@@ -1,0 +1,39 @@
+$kind: http-request
+url: "{{baseUrl}}/api/Auth/register"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"Name\": \"Wisani Hlavathi\",\r
+
+    \    \"PhoneNumber\": \"0609197193\",\r
+
+    \    \"Password\": \"Veronica@19\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status code is 200\", () => {\r
+
+      \    pm.response.to.have.status(200);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Response has a userId\", () => {\r
+
+      \    const body = pm.response.json();\r
+
+      \    pm.expect(body.userId).to.be.a('number');\r
+
+      });\r
+
+      \r
+
+      const body = pm.response.json();\r
+
+      pm.environment.set(\"userId\", body.id);"
+    language: text/javascript
+order: 1788451343160

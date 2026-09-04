@@ -1,0 +1,33 @@
+$kind: http-request
+url: "{{baseUrl}}/api/Auth/register"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"Name\": \"\",\r
+
+    \    \"PhoneNumber\": \"0669197193\",\r
+
+    \    \"Password\": \"Veronica@19\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status code is 400\", function () {\r
+
+      \    pm.response.to.have.status(400);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Error is on Name\", function () {\r
+
+      \    const body = pm.response.json();\r
+
+      \    pm.expect(body.errors).to.have.property('Name');\r
+
+      })"
+    language: text/javascript
+order: 4409697814991853

@@ -1,0 +1,44 @@
+$kind: http-request
+name: Create Order - valid
+url: "{{baseUrl}}/api/Order"
+method: POST
+headers:
+  Authorization: Bearer {{json_web_token_10m4}}
+body:
+  type: json
+  content: "{\r
+
+    \  \"orderItems\": [\r
+
+    \    {\r
+
+    \      \"orderId\": 0,\r
+
+    \      \"menuItemId\": 1,\r
+
+    \      \"quantity\": 1,\r
+
+    \      \"specialInstructions\": null\r
+
+    \    }\r
+
+    \  ],\r
+
+    \  \"estimatedCompletionTime\": null\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status code is 201\", function () {\r
+
+      \    pm.response.to.have.status(201);\r
+
+      });\r
+
+      \r
+
+      const body = pm.response.json()\r
+
+      pm.environment.set(\"orderId\", body.id);"
+    language: text/javascript
+order: 2059992180101495

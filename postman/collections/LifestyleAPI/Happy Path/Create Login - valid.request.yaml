@@ -1,0 +1,27 @@
+$kind: http-request
+url: "{{baseUrl}}/api/Auth/Login"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"PhoneNumber\": \"0842059181\",\r
+
+    \    \"Password\": \"Nhletelo@19\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status code is 200\", () => {\r
+
+      \    pm.response.to.have.status(200);\r
+
+      });\r
+
+      \r
+
+      const body = pm.response.json();\r
+
+      pm.environment.set(\"jwtToken\", body.token);"
+    language: text/javascript
+order: 88281757163710

@@ -1,0 +1,10 @@
+name: LifestyleAPI Local
+values:
+  - key: baseUrl
+    value: ''
+  - key: userId
+    value: ''
+  - key: jwtToken
+    value: ''
+  - key: orderId
+    value: ''

@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{baseUrl}}/api/Order/999"
+method: GET
+headers:
+  Authorization: Bearer {{json_web_token_10m4}}
+body:
+  type: json
+  content: ""
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status code is 404\", function () {\r
+
+      \    pm.response.to.have.status(404);\r
+
+      });"
+    language: text/javascript
+order: 4442938869548054

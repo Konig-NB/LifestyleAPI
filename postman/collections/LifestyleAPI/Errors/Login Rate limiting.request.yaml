@@ -1,0 +1,21 @@
+$kind: http-request
+url: "{{baseUrl}}/api/Auth/Login"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"PhoneNumber\": \"0852059181\",\r
+
+    \    \"Password\": \"Nhletelo@19\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status code is 401 or 409\", function (){\r
+
+      \    pm.expect([401, 429]).to.include(pm.response.code);\r
+
+      });"
+    language: text/javascript
+order: 1788546315290

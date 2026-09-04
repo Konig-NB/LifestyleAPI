@@ -1,0 +1,48 @@
+$kind: http-request
+name: Missing MenuId
+url: "{{baseUrl}}/api/Order"
+method: POST
+headers:
+  Authorization: Bearer {{json_web_token_10m4}}
+body:
+  type: json
+  content: "{\r
+
+    \  \"orderItems\": [\r
+
+    \    {\r
+
+    \      \"orderId\": 0,\r
+
+    \      \"menuItemId\": null,\r
+
+    \      \"quantity\": 1,\r
+
+    \      \"specialInstructions\": null\r
+
+    \    }\r
+
+    \  ],\r
+
+    \  \"estimatedCompletionTime\": null\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status code is 400\", function () {\r
+
+      \    pm.response.to.have.status(400);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Error is on OrderId\", function () {\r
+
+      \    const body = pm.response.json();\r
+
+      \    pm.expect(body.errors).to.have.property('OrderId');\r
+
+      })"
+    language: text/javascript
+order: 4501338499145563
