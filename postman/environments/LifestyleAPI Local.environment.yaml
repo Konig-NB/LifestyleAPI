@@ -4,7 +4,11 @@ values:
     value: ''
   - key: userId
     value: ''
-  - key: jwtToken
-    value: ''
   - key: orderId
     value: ''
+  - key: CustomerToken
+    secret: true
+  - key: AdminToken
+    secret: true
+  - key: jwtToken
+    secret: true

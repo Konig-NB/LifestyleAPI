@@ -1,15 +1,8 @@
 $kind: http-request
-url: "{{baseUrl}}/api/Auth/Login"
-method: POST
-body:
-  type: json
-  content: "{\r
-
-    \    \"PhoneNumber\": \"0712345678\",\r
-
-    \    \"Password\": \"Hoph@19\"\r
-
-    }"
+url: "{{baseUrl}}/api/users"
+method: GET
+headers:
+  Authorization: Bearer {{AdminToken}}
 scripts:
   - type: afterResponse
     code: "pm.test(\"Status code is 200\", () => {\r
@@ -18,4 +11,4 @@ scripts:
 
       });"
     language: text/javascript
-order: 88281757163710
+order: 4503542516076058

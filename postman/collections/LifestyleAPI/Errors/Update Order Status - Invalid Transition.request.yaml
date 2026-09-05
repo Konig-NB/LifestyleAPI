@@ -1,0 +1,31 @@
+$kind: http-request
+url: "{{baseUrl}}/api/order/5"
+method: PATCH
+headers:
+  Authorization: Bearer {{AdminToken}}
+body:
+  type: json
+  content: "{\r
+
+    \  \"status\": \"InProgress\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status code is 409\", () => {\r
+
+      \    pm.response.to.have.status(409);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Error mentions invalid status change\", () => {\r
+
+      \    const body = pm.response.json();\r
+
+      \    pm.expect(body.message.toLowerCase()).to.include(\"cannot change order status\");\r
+
+      });"
+    language: text/javascript
+order: 4502055039466938
