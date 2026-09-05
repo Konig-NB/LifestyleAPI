@@ -2,7 +2,7 @@ $kind: http-request
 url: "{{baseUrl}}/api/Order"
 method: GET
 headers:
-  Authorization: Bearer {{json_web_token_10m4}}
+  Authorization: Bearer {{AdminToken}}
 body:
   type: json
   content: ""

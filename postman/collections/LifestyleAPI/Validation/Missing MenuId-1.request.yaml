@@ -14,8 +14,6 @@ body:
 
     \      \"orderId\": 0,\r
 
-    \      \"menuItemId\": null,\r
-
     \      \"quantity\": 1,\r
 
     \      \"specialInstructions\": null\r
@@ -37,12 +35,12 @@ scripts:
 
       \r
 
-      pm.test(\"Error is on OrderId\", function () {\r
+      pm.test(\"Error is on OrderItems[0].MenuItemId\", () => {\r
 
       \    const body = pm.response.json();\r
 
-      \    pm.expect(body.errors).to.have.property('OrderId');\r
+      \    pm.expect(body.errors).to.have.property(\"OrderItems[0].MenuItemId\");\r
 
-      })"
+      });"
     language: text/javascript
 order: 4501338499145563

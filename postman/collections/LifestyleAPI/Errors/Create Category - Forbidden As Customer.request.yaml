@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{baseUrl}}/api/category"
+method: POST
+headers:
+  Authorization: Bearer {{CustomerToken}}
+body:
+  type: json
+  content: "{\r\n    \"name\" : \"Burger\"\r\n}"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status code is 403\", function () {\r
+
+      \    pm.response.to.have.status(403);\r
+
+      });"
+    language: text/javascript
+order: 4503599534734651

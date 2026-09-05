@@ -1,0 +1,41 @@
+$kind: http-request
+url: "{{baseUrl}}/api/order"
+method: POST
+headers:
+  Authorization: Bearer {{CustomerToken}}
+body:
+  type: json
+  content: "{\r
+
+    \  \"orderItems\": [\r
+
+    \    {\r
+
+    \      \"menuItemId\": 2,\r
+
+    \      \"quantity\": 1\r
+
+    \    }\r
+
+    \  ]\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status code is 409\", () => {\r
+
+      \    pm.response.to.have.status(409);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Error mentions item not available\", () => {\r
+
+      \    const body = pm.response.json();\r
+
+      \    pm.expect(body.message.toLowerCase()).to.include(\"not available\");\r
+
+      });"
+    language: text/javascript
+order: 4502437251777831
